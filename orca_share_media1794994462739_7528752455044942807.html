@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Clean-Up Drive - Admin</title>
+<style>
+:root{--green:#075b32;--green2:#13834b;--mint:#e8f7eb;--pale:#f3faf4;--ink:#173d28;--muted:#688071;--line:#d8e9dc}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:var(--pale);color:var(--ink);min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}.hidden{display:none!important}
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#e8f7eb,#ccebd2)}
+.auth-card{width:min(440px,100%);background:white;padding:30px;border-radius:18px;box-shadow:0 12px 35px #174d8720}
+.brand{text-align:center;margin-bottom:22px}.brand .leaf{font-size:38px}.brand h1{font-size:23px;color:var(--green);margin:8px 0}.brand p{font-size:13px;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:bold;margin:14px 0 6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fbfefb;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green2)}
+textarea{min-height:85px;resize:vertical}
+.btn{border:0;border-radius:8px;padding:11px 16px;font-weight:bold}
+.btn-primary{background:var(--green);color:white}.btn-primary:hover{background:var(--green2)}
+.btn-light{background:#e5f4e8;color:var(--green)}.btn-danger{background:#ffe7e4;color:#a52a20}
+.btn-small{padding:8px 11px;font-size:12px;margin:5px 4px 0 0}.full{width:100%;margin-top:18px}
+.switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.switch button{border:0;background:none;color:var(--green);font-weight:bold}
+.app{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:linear-gradient(180deg,#064b2a,#08713e);color:white;padding:24px 15px;overflow-y:auto}
+.sidebar h2{text-align:center;font-size:23px}.sidebar .sub{text-align:center;font-size:11px;color:#c5e8ce;margin:8px 0 30px}
+.nav-btn{display:block;width:100%;text-align:left;padding:13px 14px;margin:6px 0;border:0;border-radius:8px;background:transparent;color:white}
+.nav-btn:hover,.nav-btn.active{background:#ffffff25}.sidebar .logout{margin-top:25px;background:#ffffff18}
+.main{margin-left:245px;padding:26px;max-width:1500px}
+.topbar{background:white;border-radius:14px;padding:20px 23px;box-shadow:0 4px 18px #174d8710;border-left:5px solid var(--green2);margin-bottom:25px;display:flex;justify-content:space-between;gap:15px;align-items:center}
+.topbar h2{font-size:22px;color:var(--green)}.topbar p{font-size:13px;color:var(--muted);margin-top:5px}
+.user-pill{background:var(--mint);color:var(--green);padding:8px 12px;border-radius:30px;font-size:12px;white-space:nowrap}
+.page{display:none}.page.active{display:block}
+.page h2{font-size:22px;color:var(--green);margin-bottom:8px}
+.intro{color:var(--muted);font-size:14px;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:20px 0}
+.card,.panel{background:white;padding:20px;border-radius:13px;box-shadow:0 4px 18px #174d8710;margin-bottom:16px}
+.stat h3{font-size:13px;color:var(--muted);font-weight:normal}
+.stat strong{display:block;color:var(--green2);font-size:32px;margin-top:8px}
+.panel h3{color:var(--green);margin-bottom:13px}
+.form{max-width:720px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.event{background:white;border-radius:12px;padding:18px;margin:13px 0;border-left:5px solid var(--green2);box-shadow:0 4px 15px #174d8710}
+.event h3{color:var(--green);margin-bottom:8px}
+.event p{font-size:13px;color:var(--muted);margin:6px 0;line-height:1.45}
+.tag{display:inline-block;padding:5px 9px;border-radius:20px;background:var(--mint);color:var(--green);font-size:11px;margin:4px}
+.tag.ongoing{background:#fff1cc;color:#8b5a00}.tag.completed{background:#dff5e5;color:#126b36}
+.search{max-width:460px;margin:12px 0}
+.empty{padding:22px;text-align:center;color:var(--muted);background:white;border-radius:10px}
+.note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+table{width:100%;border-collapse:collapse;background:white;font-size:13px}
+th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}
+th{background:#e8f7eb;color:var(--green)}
+.table-wrap{overflow-x:auto;border-radius:10px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:850px){.sidebar{width:190px}.main{margin-left:190px;padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.sidebar{position:static;width:100%;height:auto;padding:13px}.sidebar h2{font-size:20px}.sidebar .sub{margin:4px 0 12px}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.nav-btn{font-size:12px;padding:10px;margin:0}.sidebar .logout{margin-top:7px}.main{margin:0;padding:13px}.topbar{align-items:flex-start;flex-direction:column}.topbar h2{font-size:18px}.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.auth-card{padding:22px}}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth-wrap">
+<div class="auth-card">
+<div class="brand">
+<div class="leaf">🌱</div>
+<h1>Community Clean-Up Drive</h1>
+<p>Admin Management System</p>
+</div>
+<div id="loginBox">
+<h2>Admin Login</h2>
+<label>Email</label>
+<input id="loginEmail" type="email" placeholder="Enter your email">
+<label>Password</label>
+<input id="loginPassword" type="password" placeholder="Enter your password">
+<button class="btn btn-primary full" onclick="login()">Login</button>
+<p class="switch">No admin account yet? <button onclick="showAuth('register')">Register here</button></p>
+</div>
+<div id="registerBox" class="hidden">
+<h2>Create Admin Account</h2>
+<label>Full Name</label>
+<input id="regName" placeholder="Enter your full name">
+<label>Email</label>
+<input id="regEmail" type="email" placeholder="Enter your email">
+<label>Password</label>
+<input id="regPassword" type="password" placeholder="At least 4 characters">
+<button class="btn btn-primary full" onclick="register()">Create Admin Account</button>
+<p class="switch">Already registered? <button onclick="showAuth('login')">Login</button></p>
+</div>
+<p class="note">Demo project: Data is saved in this browser only.</p>
+</div>
+</div>
+
+<div id="app" class="app hidden">
+<aside class="sidebar">
+<h2>🌿 CleanUp</h2>
+<p class="sub">ADMIN MANAGEMENT SYSTEM</p>
+<div class="nav">
+<button class="nav-btn active" onclick="showPage('dashboard',this)">🏠 Admin Dashboard</button>
+<button class="nav-btn" onclick="showPage('events',this)">📅 Manage Events</button>
+<button class="nav-btn" onclick="showPage('create',this)">➕ Create Event</button>
+<button class="nav-btn" onclick="showPage('volunteers',this)">👥 Manage Volunteers</button>
+<button class="nav-btn" onclick="showPage('schedule',this)">📍 Schedule & Location</button>
+<button class="nav-btn" onclick="showPage('proof',this)">📷 Review Proof</button>
+<button class="nav-btn" onclick="showPage('reports',this)">📄 Generate Reports</button>
+<button class="nav-btn" onclick="showPage('about',this)">ℹ About System</button>
+</div>
+<button class="nav-btn logout" onclick="logout()">↪ Logout</button>
+</aside>
+<main class="main">
+<header class="topbar">
+<div><h2 id="panelTitle">Admin Management Panel</h2><p id="welcome">Welcome, Admin!</p></div>
+<span class="user-pill">Admin</span>
+</header>
+
+<section id="dashboard" class="page active">
+<h2>Dashboard</h2>
+<p class="intro">Overview of community clean-up activities.</p>
+<div class="cards">
+<div class="card stat"><h3>Total Events</h3><strong id="totalEvents">0</strong></div>
+<div class="card stat"><h3>Registered Volunteers</h3><strong id="totalVolunteers">0</strong></div>
+<div class="card stat"><h3>Ongoing Events</h3><strong id="ongoingEvents">0</strong></div>
+<div class="card stat"><h3>Completed Events</h3><strong id="completedEvents">0</strong></div>
+</div>
+<div class="panel"><h3>Recent Clean-Up Events</h3><div id="recentEvents"></div></div>
+<button class="btn btn-primary" onclick="showPage('events')">View All Events</button>
+</section>
+
+<section id="events" class="page">
+<h2>Clean-Up Events</h2><p class="intro">View and manage community clean-up activities.</p>
+<input class="search" id="eventSearch" placeholder="Search event or location..." oninput="renderEvents()">
+<div id="eventList"></div>
+</section>
+
+<section id="create" class="page">
+<h2 id="eventFormTitle">Create Clean-Up Event</h2><p class="intro">Provide event details and schedule.</p>
+<div class="panel form">
+<div class="grid2">
+<div><label>Event Name *</label><input id="eventName" placeholder="Community Park Clean-Up"></div>
+<div><label>Target Area / Location *</label><input id="eventLocation" placeholder="Enter location"></div>
+<div><label>Date *</label><input id="eventDate" type="date"></div>
+<div><label>Time *</label><input id="eventTime" type="time"></div>
+<div><label>Organizer</label><input id="eventOrganizer" placeholder="Organizer / Barangay"></div>
+<div><label>Volunteer Limit</label><input id="eventLimit" type="number" min="1" value="30"></div>
+</div>
+<label>Description / Instructions</label>
+<textarea id="eventDescription" placeholder="Describe the activity..."></textarea>
+<button class="btn btn-primary" onclick="saveEvent()" id="eventSaveBtn">Save Event</button>
+<button class="btn btn-light" onclick="clearEventForm()">Clear</button>
+<p class="note" id="eventMessage"></p>
+</div>
+</section>
+
+<section id="volunteers" class="page">
+<h2>Volunteer Registration & Assignment</h2>
+<p class="intro">View volunteers registered for each event.</p>
+<div id="volunteerList"></div>
+</section>
+
+<section id="schedule" class="page">
+<h2>Schedule & Location Mapping</h2><p class="intro">Check event dates, times, and locations.</p>
+<div id="scheduleList"></div>
+</section>
+
+<section id="proof" class="page">
+<h2>Upload Proof & Evaluation</h2><p class="intro">Submit an image as proof and add an evaluation.</p>
+<div class="panel form">
+<label>Select Completed Event</label><select id="proofEvent"></select>
+<label>Upload Proof Image</label><input id="proofFile" type="file" accept="image/*">
+<label>Evaluation / Remarks</label><textarea id="proofRemarks" placeholder="Describe the result..."></textarea>
+<label>Number of Volunteers Present</label><input id="proofAttendance" type="number" min="0" placeholder="Enter attendance">
+<button class="btn btn-primary" onclick="saveProof()">Submit Proof & Evaluation</button>
+<p class="note" id="proofMessage">Choose a completed event.</p>
+</div>
+<div class="panel"><h3>Submitted Evaluations</h3><div id="proofList"></div></div>
+</section>
+
+<section id="reports" class="page">
+<h2>Generate Reports</h2><p class="intro">Summary of events and volunteer participation.</p>
+<div class="cards">
+<div class="card stat"><h3>Total Events</h3><strong id="reportTotal">0</strong></div>
+<div class="card stat"><h3>Completed</h3><strong id="reportCompleted">0</strong></div>
+<div class="card stat"><h3>Pending / Ongoing</h3><strong id="reportPending">0</strong></div>
+<div class="card stat"><h3>Total Volunteers</h3><strong id="reportVolunteers">0</strong></div>
+</div>
+<div class="panel"><h3>Event Report</h3><div class="table-wrap">
+<table><thead><tr><th>Event</th><th>Date</th><th>Location</th><th>Volunteers</th><th>Status</th></tr></thead><tbody id="reportTable"></tbody></table>
+</div><button class="btn btn-primary" onclick="downloadReport()">Download CSV Report</button></div>
+</section>
+
+<section id="about" class="page">
+<h2>About the System</h2>
+<div class="panel"><h3>Community Clean-Up Drive Coordination System</h3>
+<p>This web-based system helps administrators, volunteers, and barangay officials organize community clean-up activities.</p><br>
+<p><b>Purpose:</b> To make event creation, volunteer registration, scheduling, proof submission, and report generation easier.</p><br>
+<p><b>Process:</b> Login → Dashboard → View/Create Event → Volunteer Registration → Schedule → Clean-Up Drive → Upload Proof → Generate Report.</p>
+</div>
+</section>
+<footer>Community Clean-Up Drive Coordination System</footer>
+</main>
+</div>
+
+<script>
+const KEY_USERS="cleanup_users_v1";
+const KEY_EVENTS="cleanup_events_v1";
+const KEY_CURRENT="cleanup_current_v1";
+let users=JSON.parse(localStorage.getItem(KEY_USERS)||"[]");
+let events=JSON.parse(localStorage.getItem(KEY_EVENTS)||"[]");
+let currentUser=JSON.parse(localStorage.getItem(KEY_CURRENT)||"null");
+let editingEvent=null;
+
+function saveAll(){
+localStorage.setItem(KEY_USERS,JSON.stringify(users));
+localStorage.setItem(KEY_EVENTS,JSON.stringify(events));
+}
+function showAuth(which){
+loginBox.classList.toggle("hidden",which!=="login");
+registerBox.classList.toggle("hidden",which!=="register");
+}
+function register(){
+const name=regName.value.trim(),email=regEmail.value.trim().toLowerCase(),password=regPassword.value;
+if(!name||!email||password.length<4){alert("Please complete all fields. Password must have at least 4 characters.");return;}
+if(users.some(u=>u.email===email)){alert("Email is already registered.");return;}
+users.push({id:Date.now(),name,email,password,role:"Admin"});
+saveAll();alert("Admin registration successful!");showAuth("login");loginEmail.value=email;
+}
+function login(){
+const email=loginEmail.value.trim().toLowerCase(),password=loginPassword.value;
+const user=users.find(u=>u.email===email&&u.password===password&&u.role==="Admin");
+if(!user){alert("Incorrect admin email or password.");return;}
+currentUser={id:user.id,name:user.name,email:user.email,role:user.role};
+localStorage.setItem(KEY_CURRENT,JSON.stringify(currentUser));openApp();
+}
+function logout(){
+currentUser=null;localStorage.removeItem(KEY_CURRENT);
+app.classList.add("hidden");auth.classList.remove("hidden");
+}
+function isAdmin(){return currentUser&&currentUser.role==="Admin";}
+function openApp(){
+if(!isAdmin())return;
+auth.classList.add("hidden");app.classList.remove("hidden");
+welcome.textContent="Welcome, "+currentUser.name+"!";
+showPage("dashboard");refresh();
+}
+function showPage(id,button){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+if(button)button.classList.add("active");
+else document.querySelectorAll(".nav-btn").forEach(b=>{if((b.getAttribute("onclick")||"").includes("'"+id+"'"))b.classList.add("active")});
+refresh();
+}
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function saveEvent(){
+const name=eventName.value.trim(),location=eventLocation.value.trim(),date=eventDate.value,time=eventTime.value;
+if(!name||!location||!date||!time){alert("Please complete the required fields.");return;}
+const data={name,location,date,time,organizer:eventOrganizer.value.trim()||currentUser.name,limit:Math.max(1,Number(eventLimit.value)||30),description:eventDescription.value.trim()};
+if(editingEvent!==null)events[editingEvent]={...events[editingEvent],...data};
+else events.push({id:Date.now(),...data,status:"Scheduled",volunteers:[],proofs:[]});
+saveAll();clearEventForm();eventMessage.textContent="Event saved successfully.";showPage("events");
+}
+function clearEventForm(){
+["eventName","eventLocation","eventDate","eventTime","eventOrganizer","eventDescription"].forEach(id=>document.getElementById(id).value="");
+eventLimit.value=30;editingEvent=null;eventFormTitle.textContent="Create Clean-Up Event";eventSaveBtn.textContent="Save Event";
+}
+function editEvent(id){
+const i=events.findIndex(e=>e.id===id);if(i<0)return;
+const e=events[i];editingEvent=i;
+eventName.value=e.name;eventLocation.value=e.location;eventDate.value=e.date;eventTime.value=e.time;eventOrganizer.value=e.organizer;eventLimit.value=e.limit;eventDescription.value=e.description||"";
+eventFormTitle.textContent="Update Clean-Up Event";eventSaveBtn.textContent="Update Event";showPage("create");
+}
+function deleteEvent(id){
+if(confirm("Delete this event?")){events=events.filter(e=>e.id!==id);saveAll();refresh();}
+}
+function updateEventStatus(id,status){
+const e=events.find(x=>x.id===id);if(!e)return;
+if(status==="Completed"&&!confirm("Mark this event as completed?"))return;
+e.status=status;saveAll();refresh();
+}
+function renderEvents(){
+const q=(eventSearch.value||"").toLowerCase();
+const list=events.filter(e=>(e.name+" "+e.location).toLowerCase().includes(q));
+if(!list.length){eventList.innerHTML='<div class="empty">No clean-up events found.</div>';return;}
+eventList.innerHTML=list.map(e=>`
+<article class="event"><h3>${safe(e.name)}</h3>
+<span class="tag ${safe(e.status.toLowerCase())}">${safe(e.status)}</span>
+<span class="tag">${e.volunteers.length}/${e.limit} volunteers</span>
+<p>📅 ${safe(e.date)} at ${safe(e.time)}</p><p>📍 ${safe(e.location)}</p>
+<p>Organizer: ${safe(e.organizer)}</p><p>${safe(e.description||"No description provided.")}</p>
+<button class="btn btn-light btn-small" onclick="editEvent(${e.id})">Edit</button>
+<button class="btn btn-light btn-small" onclick="updateEventStatus(${e.id},'Ongoing')">Start / Continue</button>
+<button class="btn btn-primary btn-small" onclick="updateEventStatus(${e.id},'Completed')">Mark Completed</button>
+<button class="btn btn-danger btn-small" onclick="deleteEvent(${e.id})">Delete</button>
+</article>`).join("");
+}
+function renderVolunteers(){
+if(!events.length){volunteerList.innerHTML='<div class="empty">No events available.</div>';return;}
+volunteerList.innerHTML=events.map(e=>`<div class="panel"><h3>${safe(e.name)}</h3><p class="note">${safe(e.date)} · ${safe(e.location)}</p>
+${e.volunteers.length?e.volunteers.map(v=>`<span class="tag">👤 ${safe(v.name)} — ${safe(v.role)}</span>`).join(""):'<p class="note">No volunteers registered yet.</p>'}</div>`).join("");
+}
+function renderSchedule(){
+if(!events.length){scheduleList.innerHTML='<div class="empty">No schedules available.</div>';return;}
+scheduleList.innerHTML=events.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`
+<div class="event"><h3>${safe(e.name)}</h3><p>📅 Date: ${safe(e.date)} · Time: ${safe(e.time)}</p>
+<p>📍 Location: ${safe(e.location)}</p><p>Status: <span class="tag ${safe(e.status.toLowerCase())}">${safe(e.status)}</span></p>
+<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.location)}">Open location in Google Maps ↗</a></div>`).join("");
+}
+function renderProof(){
+const completed=events.filter(e=>e.status==="Completed");
+proofEvent.innerHTML=completed.length?completed.map(e=>`<option value="${e.id}">${safe(e.name)} — ${safe(e.date)}</option>`).join(""):'<option value="">No completed events available</option>';
+const entries=events.flatMap(e=>(e.proofs||[]).map(p=>({...p,eventName:e.name})));
+proofList.innerHTML=entries.length?entries.map(p=>`
+<div class="event"><h3>${safe(p.eventName)}</h3><p>Attendance: ${safe(p.attendance)} volunteers</p><p>${safe(p.remarks)}</p>
+<p class="note">Submitted by: ${safe(p.submittedBy||"Unknown")}</p><p class="note">Proof file: ${safe(p.fileName||"No file name")}</p>
+${p.image?`<img alt="Clean-up proof" src="${p.image}" style="max-width:180px;max-height:140px;border-radius:8px;margin-top:8px">`:""}</div>`).join(""):'<p class="note">No proof or evaluation submitted yet.</p>';
+}
+function saveProof(){
+const id=Number(proofEvent.value),e=events.find(x=>x.id===id);
+if(!e){alert("No completed event available.");return;}
+const file=proofFile.files[0],remarks=proofRemarks.value.trim(),attendance=proofAttendance.value;
+if(!file||!remarks||attendance===""){alert("Please complete all fields and upload an image.");return;}
+if(!file.type.startsWith("image/")){alert("Please select an image file.");return;}
+if(file.size>1200000){alert("Please choose an image smaller than 1.2 MB.");return;}
+const reader=new FileReader();
+reader.onload=()=>{
+e.proofs=e.proofs||[];
+e.proofs.push({fileName:file.name,image:reader.result,remarks,attendance,submittedBy:currentUser.name,submittedAt:new Date().toISOString()});
+saveAll();proofFile.value="";proofRemarks.value="";proofAttendance.value="";
+proofMessage.textContent="Proof and evaluation submitted successfully.";refresh();
+};
+reader.readAsDataURL(file);
+}
+function updateDashboard(){
+const volunteers=new Set(events.flatMap(e=>e.volunteers.map(v=>v.userId)));
+totalEvents.textContent=events.length;totalVolunteers.textContent=volunteers.size;
+ongoingEvents.textContent=events.filter(e=>e.status==="Ongoing").length;
+completedEvents.textContent=events.filter(e=>e.status==="Completed").length;
+recentEvents.innerHTML=events.length?events.slice(-4).reverse().map(e=>`
+<div class="event"><h3>${safe(e.name)}</h3><p>${safe(e.date)} · ${safe(e.location)}</p><span class="tag ${safe(e.status.toLowerCase())}">${safe(e.status)}</span></div>`).join(""):'<div class="empty">No events yet.</div>';
+}
+function updateReports(){
+const completed=events.filter(e=>e.status==="Completed").length;
+const volunteers=new Set(events.flatMap(e=>e.volunteers.map(v=>v.userId))).size;
+reportTotal.textContent=events.length;reportCompleted.textContent=completed;
+reportPending.textContent=events.length-completed;reportVolunteers.textContent=volunteers;
+reportTable.innerHTML=events.map(e=>`<tr><td>${safe(e.name)}</td><td>${safe(e.date)}</td><td>${safe(e.location)}</td><td>${e.volunteers.length}</td><td>${safe(e.status)}</td></tr>`).join("")||'<tr><td colspan="5">No event records yet.</td></tr>';
+}
+function downloadReport(){
+const rows=[["Event Name","Date","Time","Location","Organizer","Volunteers","Status","Evaluations"]];
+events.forEach(e=>rows.push([e.name,e.date,e.time,e.location,e.organizer,e.volunteers.length,e.status,(e.proofs||[]).length]));
+const csv=rows.map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");
+const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+const url=URL.createObjectURL(blob),a=document.createElement("a");
+a.href=url;a.download="community-cleanup-report.csv";a.click();URL.revokeObjectURL(url);
+}
+function refresh(){updateDashboard();renderEvents();renderVolunteers();renderSchedule();renderProof();updateReports();}
+if(currentUser&&currentUser.role==="Admin")openApp();
+else if(currentUser){currentUser=null;localStorage.removeItem(KEY_CURRENT);}
+</script>
+</body>
+</html>
